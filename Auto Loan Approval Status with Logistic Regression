@@ -1,7 +1,8 @@
 /* 
-Description 			: Logistic Regression model building of loan approval status prediction 
+Description 		: Logistic Regression model building of loan approval status prediction 
 Date of first written	: Wed, 2-Dec-2020
 Date of last updated	: Mon, 25-Jan-2021
+Language 		: SAS
  */
 
 
