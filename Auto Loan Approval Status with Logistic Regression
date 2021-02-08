@@ -1,0 +1,2096 @@
+/* 
+Description 			: Logistic Regression model building of loan approval status prediction 
+Date of first written	: Wed, 2-Dec-2020
+Date of last updated	: Mon, 25-Jan-2021
+ */
+
+
+/*******************************************
+7.8. Create a copy of the TRAINING_DS dataset  
+*******************************************/
+PROC SQL;
+
+CREATE TABLE MYLIB295.TRAINING_DS_A AS
+SELECT *FROM MYLIB295.TRAINING_DS;
+
+QUIT;
+
+/*******************************************************************
+7.9. To display the structure of the dataset MYLIB295.TRAINING_DS_A
+********************************************************************/
+PROC CONTENTS DATA = MYLIB295.TRAINING_DS_A; 
+
+RUN; 
+
+/*******************************************************************
+7.10. To display the observations found inside the MYLIB295.TRAINING_DS_A
+********************************************************************/
+PROC SQL; 
+
+SELECT *FROM MYLIB295.TRAINING_DS_A T;
+
+QUIT; 
+
+/*******************************************************************
+7.11.1 Exploration on the categorical variables found in the data set MYLIB295.TRAINING_DS_A
+*******************************************************************/
+PROC FREQ DATA = MYLIB295.TRAINING_DS_A;
+
+TITLE "Fig 7.11.1.1 Univariate Analysis on GENDER - categorical variable";
+TABLE GENDER;
+
+RUN;
+
+ODS GRAPHICS / RESET WIDTH=4.0 IN HEIGHT 3.0 IN IMAGEMAP;
+PROC SGPLOT DATA = MYLIB295.TRAINING_DS_A;
+
+VBAR GENDER; 
+TITLE "Fig 7.11.1.1 Univariate Analysis on GENDER - categorical variable";
+
+RUN;
+
+/*******************************************************************
+7.11.1.2 Univariate Analysis on MARITAL_STATUS - Categorical variable
+*******************************************************************/
+PROC FREQ DATA = MYLIB295.TRAINING_DS_A;
+
+TITLE "Fig 7.11.1.2 Univariate Analysis on MARITAL STATUS - categorical variable";
+TABLE MARITAL_STATUS;
+
+RUN;
+
+ODS GRAPHICS / RESET WIDTH=4.0 IN HEIGHT 3.0 IN IMAGEMAP;
+PROC SGPLOT DATA = MYLIB295.TRAINING_DS_A;
+
+VBAR MARITAL_STATUS;
+TITLE "Fig 7.11.1.2 Univariate Analysis on MARITAL STATUS - categorical variable";
+
+RUN;
+
+/*******************************************************************
+7.11.1.3 Univariate Analysis on FAMILY_MEMBERS - Categorical variable
+*******************************************************************/
+PROC FREQ DATA = MYLIB295.TRAINING_DS_A;
+
+TITLE "Fig 7.11.1.3. Univariate Analysis on FAMILY MEMBERS - categorical variable";
+TABLE FAMILY_MEMBERS;
+
+RUN;
+
+ODS GRAPHICS / RESET WIDTH=4.0 IN HEIGHT 3.0 IN IMAGEMAP;
+PROC SGPLOT DATA = MYLIB295.TRAINING_DS_A;
+
+VBAR FAMILY_MEMBERS;
+TITLE "Fig 7.11.1.3. Univariate Analysis on FAMILY MEMBERS - categorical variable";
+
+RUN;
+
+/*******************************************************************
+7.11.1.4 Univariate Analysis on EMPLOYMENT - Categorical variable
+*******************************************************************/
+PROC FREQ DATA = MYLIB295.TRAINING_DS_A;
+
+TITLE "Fig 7.11.1.4. Univariate Analysis on EMPLOYEMENT - categorical variable";
+TABLE EMPLOYMENT;
+
+RUN;
+
+ODS GRAPHICS / RESET WIDTH=4.0 IN HEIGHT 3.0 IN IMAGEMAP;
+PROC SGPLOT DATA = MYLIB295.TRAINING_DS_A;
+
+VBAR EMPLOYMENT;
+TITLE "Fig 7.6.8. Univariate Analysis on EMPLOYEMENT - categorical variable";
+
+RUN;
+
+/*******************************************************************
+7.11.1.5 Univariate Analysis on LOAN_HISTORY - Categorical variable
+*******************************************************************/
+PROC FREQ DATA = MYLIB295.TRAINING_DS_A;
+
+TITLE "Fig 7.11.1.5. Univariate Analysis on LOAN HISTORY - categorical variable";
+TABLE LOAN_HISTORY;
+
+RUN;
+
+ODS GRAPHICS / RESET WIDTH=4.0 IN HEIGHT 3.0 IN IMAGEMAP;
+PROC SGPLOT DATA = MYLIB295.TRAINING_DS_A;
+
+VBAR LOAN_HISTORY;
+TITLE "Fig 7.11.1.5 Univariate Analysis on LOAN HISTORY - categorical variable";
+
+RUN;
+
+/*******************************************************************
+7.11.1.6 Univariate Analysis on LOAN_LOCATION - Categorical variable
+*******************************************************************/
+PROC FREQ DATA = MYLIB295.TRAINING_DS_A;
+TITLE "Fig 7.11.1.6 Univariate Analysis on LOAN LOCATION - categorical variable";
+TABLE LOAN_LOCATION;
+
+RUN;
+
+ODS GRAPHICS / RESET WIDTH=4.0 IN HEIGHT 3.0 IN IMAGEMAP;
+PROC SGPLOT DATA = MYLIB295.TRAINING_DS_A;
+
+VBAR LOAN_LOCATION;
+TITLE "Fig 7.11.1.6 Univariate Analysis on LOAN LOCATION - categorical variable";
+
+RUN;
+
+/*******************************************************************
+7.11.1.7 Univariate Analysis on LOAN_APPROVAL_STATUS - Categorical variable
+*******************************************************************/
+PROC FREQ DATA = MYLIB295.TRAINING_DS_A;
+
+TITLE "Fig 7.11.1.7 Univariate Analysis on LOAN APPROVAL STATUS - categorical variable";
+TABLE LOAN_APPROVAL_STATUS;
+
+RUN;
+
+ODS GRAPHICS / RESET WIDTH=4.0 IN HEIGHT 3.0 IN IMAGEMAP;
+PROC SGPLOT DATA = MYLIB295.TRAINING_DS_A;
+
+VBAR LOAN_APPROVAL_STATUS;
+TITLE "Fig 7.11.1.7 Univariate Analysis on LOAN APPROVAL STATUS - categorical variable";
+
+RUN;
+
+/*******************************************************************
+7.11.1.8 Univariate Analysis on QUALIFICATION - Categorical variable
+*******************************************************************/
+PROC FREQ DATA = MYLIB295.TRAINING_DS_A;
+
+TITLE "Fig 7.11.1.7 Univariate Analysis on QUALIFICATION - categorical variable";
+TABLE QUALIFICATION;
+
+RUN;
+
+ODS GRAPHICS / RESET WIDTH=4.0 IN HEIGHT 3.0 IN IMAGEMAP;
+PROC SGPLOT DATA = MYLIB295.TRAINING_DS_A;
+
+VBAR QUALIFICATION;
+TITLE "Fig 7.11.1.7 Univariate Analysis on QUALIFICATION - categorical variable";
+
+RUN;
+
+/*******************************************************************
+7.11.2.1 Univariate Analysis on CANDIDATE INCOME - Continuous variable
+*******************************************************************/
+PROC MEANS DATA =  MYLIB295.TRAINING_DS_A N NMISS MIN MAX MEAN MEDIAN STD;
+
+VAR CANDIDATE_INCOME;
+TITLE "Fig 7.11.2.1 Univariate Analysis on CANDIDATE INCOME - Continuous variable ";
+
+RUN;
+
+ODS GRAPHICS / RESET WIDTH=4.0 IN HEIGHT=3.0 IN IMAGEMAP;
+PROC SGPLOT DATA =  MYLIB295.TRAINING_DS_A;
+
+HISTOGRAM CANDIDATE_INCOME;
+TITLE "Fig 7.11.2.1 Univariate Analysis on CANDIDATE INCOME - Continuous variable ";
+
+RUN;
+
+/*******************************************************************
+7.11.2.2 Univariate Analysis on GUARANTEE_INCOME - Continuous variable
+*******************************************************************/
+PROC MEANS DATA =  MYLIB295.TRAINING_DS_A N NMISS MIN MAX MEAN MEDIAN STD;
+
+VAR GUARANTEE_INCOME;
+TITLE "Fig 7.11.2.2 Univariate Analysis on GUARANTEE INCOME - Continuous variable ";
+
+RUN;
+
+ODS GRAPHICS / RESET WIDTH=4.0 IN HEIGHT=3.0 IN IMAGEMAP;
+PROC SGPLOT DATA =  MYLIB295.TRAINING_DS_A;
+
+HISTOGRAM GUARANTEE_INCOME;
+TITLE "Fig 7.11.2.2 Univariate Analysis on GUARANTEE INCOME - Continuous variable ";
+
+RUN;
+
+/*******************************************************************
+7.11.2.3 Univariate Analysis on LOAN_AMOUNT - Continuous variable
+*******************************************************************/
+PROC MEANS DATA =  MYLIB295.TRAINING_DS_A N NMISS MIN MAX MEAN MEDIAN STD;
+
+VAR LOAN_AMOUNT;
+TITLE "Fig 7.11.2.3 Univariate Analysis on LOAN AMOUNT - Continuous variable ";
+
+RUN;
+
+ODS GRAPHICS / RESET WIDTH=4.0 IN HEIGHT=3.0 IN IMAGEMAP;
+PROC SGPLOT DATA =  MYLIB295.TRAINING_DS_A;
+
+HISTOGRAM LOAN_AMOUNT;
+TITLE "Fig 7.11.2.3 Univariate Analysis on LOAN AMOUNT - Continuous variable ";
+
+RUN;
+
+
+/*******************************************************************
+7.11.2.4 Univariate Analysis on LOAN_DURATION - Continuous variable
+*******************************************************************/
+PROC MEANS DATA =  MYLIB295.TRAINING_DS_A N NMISS MIN MAX MEAN MEDIAN STD;
+
+VAR LOAN_DURATION;
+TITLE "Fig 7.11.2.4 Univariate Analysis on LOAN DURATION - Continuous variable ";
+
+RUN;
+
+ODS GRAPHICS / RESET WIDTH=4.0 IN HEIGHT=3.0 IN IMAGEMAP;
+PROC SGPLOT DATA =  MYLIB295.TRAINING_DS_A;
+
+HISTOGRAM LOAN_DURATION;
+TITLE "Fig 7.11.2.4 Univariate Analysis on LOAN DURATION - Continuous variable ";
+
+RUN;
+
+/*******************************************************************
+7.12.1.1 Bivariate Analysis on GENDER VS MARITAL STATUS
+*******************************************************************/
+PROC FREQ DATA =  MYLIB295.TRAINING_DS_A;
+
+TABLE GENDER * MARITAL_STATUS /
+PLOTS = FREQPLOT( TWOWAY = STACKED SCALE = GROUPPCT );
+TITLE "Fig 7.5 Bivariate Analysis on GENDER ( Categorical vatiable ) Versus MARITAL_STATUS ( Categorical variable ) ";
+
+RUN;       
+
+/*******************************************************************
+7.12.1.2 Bivariate Analysis on GENDER VS FAMILY MEMBERS
+*******************************************************************/
+PROC FREQ DATA =  MYLIB295.TRAINING_DS_A;
+
+TABLE GENDER * FAMILY_MEMBERS /
+PLOTS = FREQPLOT( TWOWAY = STACKED SCALE = GROUPPCT );
+TITLE "Fig 7.12.1.1 Bivariate Analysis on GENDER ( Categorical variable ) Versus FAMILY_MEMBERS ( Categorical variable ) ";
+
+RUN;       
+
+/*******************************************************************
+7.12.1.3 Bivariate Analysis on GENDER VS QUALIFICATION
+*******************************************************************/
+PROC FREQ DATA =  MYLIB295.TRAINING_DS_A;
+
+TABLE GENDER * QUALIFICATION/
+PLOTS = FREQPLOT( TWOWAY = STACKED SCALE = GROUPPCT );
+TITLE "Fig 7.12.1.3 Bivariate Analysis on GENDER ( Categorical variable ) Versus QUALIFICATION ( Categorical variable ) ";
+
+RUN;       
+
+/*******************************************************************
+7.12.1.4 Bivariate Analysis on EMPLOYMENT VS LOAN APPROVAL STATUS
+*******************************************************************/
+PROC FREQ DATA =  MYLIB295.TRAINING_DS_A;
+
+TABLE EMPLOYMENT * LOAN_APPROVAL_STATUS/
+PLOTS = FREQPLOT( TWOWAY = STACKED SCALE = GROUPPCT );
+TITLE "Fig 7.12.1.4 Bivariate Analysis on EMPLOYMENT ( Categorical variable ) Versus LOAN_APPROVAL_STATUS ( Categorical variable ) ";
+
+RUN;      
+
+/*******************************************************************
+7.12.1.5 Bivariate Analysis on FAMILY_MEMBERS vs LOAN_LOCATION
+*******************************************************************/
+PROC FREQ DATA =  MYLIB295.TRAINING_DS_A;
+
+TABLE FAMILY_MEMBERS * LOAN_LOCATION/
+PLOTS = FREQPLOT( TWOWAY = STACKED SCALE = GROUPPCT );
+TITLE "Fig 7.12.1.5 Bivariate Analysis on FAMILY_MEMBERS (Categorical variable) vs LOAN_LOCATION ( Categorical variable ) ";
+
+RUN;      
+
+/*******************************************************************
+7.12.1.6 Bivariate Analysis on FAMILY_MEMBERS vs LOAN_APPROVAL_STATUS 
+*******************************************************************/
+PROC FREQ DATA =  MYLIB295.TRAINING_DS_A;
+
+TABLE FAMILY_MEMBERS * LOAN_APPROVAL_STATUS/
+PLOTS = FREQPLOT (TWOWAY = STACKED SCALE = GROUPPCT);
+TITLE "Fig 7.12.1.6 Bivariate Analysis on FAMILY_MEMBERS (Categorical variable) vs LOAN_APPROVAL_STATUS (Categorical variable) ";
+
+RUN;    
+
+/*******************************************************************
+7.12.2.1 Bivariate Analysis on CANDIDATE INCOME vs LOAN_APPROVAL_STATUS  
+*******************************************************************/
+PROC MEANS DATA =  MYLIB295.TRAINING_DS_A;
+
+CLASS LOAN_APPROVAL_STATUS;  /* CHAR*/
+VAR CANDIDATE_INCOME; /* NUMERIC*/
+TITLE "Fig 7.12.2.1 Bivariate Analysis on CANDIDATE_INCOME (Continuous variable) Versus FAMILY_MEMBERS (Categorical variable) ";
+
+RUN;
+
+PROC SGPLOT DATA =  MYLIB295.TRAINING_DS_A;
+
+VBOX CANDIDATE_INCOME / CATEGORY=LOAN_APPROVAL_STATUS;
+/*FM X-AXIS CI Y-AXIS */ 
+TITLE "Fig 7.12.2.2 Bivariate Analysis on CANDIDATE_INCOME(Continuous variable) Versus LOAN_APPROVAL_STATUS (Categorical variable) ";
+
+RUN;
+
+/*******************************************************************
+7.12.1.2 Bivariate Analysis on CANDIDATE INCOME vs LOAN APPROVAL STATUS
+*******************************************************************/
+PROC MEANS DATA =  MYLIB295.TRAINING_DS_A;
+
+CLASS LOAN_APPROVAL_STATUS;  /* CHAR*/
+VAR CANDIDATE_INCOME; /* NUMERIC*/
+TITLE "Fig 7.12.1.2 Bivariate Analysis on CANDIDATE_INCOME (Continuous variable) Versus LOAN_APPROVAL_STATUS (Categorical variable) ";
+
+RUN;
+
+PROC SGPLOT DATA =  MYLIB295.TRAINING_DS_A;
+
+VBOX CANDIDATE_INCOME / CATEGORY=LOAN_APPROVAL_STATUS;
+/*LAS X-AXIS CI Y-AXIS */ 
+TITLE "Fig 7.12.1.2 Bivariate Analysis on CANDIDATE_INCOME (Continuous variable) Versus LOAN_APPROVAL_STATUS (Categorical variable) ";
+
+RUN;
+
+/*******************************************************************
+7.12.2.3 Bivariate Analysis on LOAN DURATION vs LOAN APPROVAL STATUS
+*******************************************************************/
+PROC FREQ DATA =  MYLIB295.TRAINING_DS_A ORDER = FREQ;
+
+TABLE LOAN_DURATION * LOAN_APPROVAL_STATUS /
+PLOTS = FREQPLOT( TWOWAY = STAKED SCALE = GROUPPCT );
+ODS GRAPHICS / RESET WIDTH=4.0 IN HEIGHT=3.0 IN IMAGEMAP;
+TITLE "Fig 7.11.2.3. Bivariate Analysis on LOAN_DURATION Versus LOAN_APPROVAL_STATUS ";  
+
+QUIT;
+
+/*******************************************************************
+7.12.2.4 Bivariate Analysis on MARITAL STATUS vs CANDIDATE INCOME
+*******************************************************************/
+PROC MEANS DATA =  MYLIB295.TRAINING_DS_A;
+
+CLASS MARITAL_STATUS;  /* CHAR*/
+VAR CANDIDATE_INCOME; /* NUMERIC*/
+TITLE "Fig 7.12.2.4 Bivariate Analysis on MARITAL_STATUS (Categorical variable) Versus CANDIDATE_INCOME (Continuous variable)";
+
+RUN;
+
+/*******************************************************************
+7.12.3.1 Correlation Analysis on CANDIDATE INCOME and GUARANTEE INCOME
+*******************************************************************/
+PROC CORR DATA =  MYLIB295.TRAINING_DS_A PLOTS = SCATTER;
+
+VAR  CANDIDATE_INCOME GUARANTEE_INCOME ;
+ODS GRAPHICS / RESET WIDTH=4.0 IN HEIGHT=3.0 IN IMAGEMAP;
+TITLE "Fig 7.12.3.1 Corelation Analysis on the variables CANDIDATE_INCOME GUARANTEE_INCOME  ";  
+
+QUIT;
+
+/*******************************************************************
+7.12.3.2 Bivariate Analysis on LOAN_AMOUNT vs LOAN_DURATION
+*******************************************************************/
+PROC MEANS DATA =  MYLIB295.TRAINING_DS_A;
+
+CLASS LOAN_DURATION;  /* NUMERIC*/
+VAR LOAN_AMOUNT; /* NUMERIC*/
+TITLE "Fig 7.12.3.2 Bivariate Analysis on LOAN_AMOUNT (Continuous variable) Versus LOAN_DURATION (Continuous variable) ";
+
+RUN; 
+
+PROC SGPLOT DATA =  MYLIB295.TRAINING_DS_A;
+
+VBOX LOAN_AMOUNT / CATEGORY=LOAN_DURATION;
+/*LD X-AXIS LA Y-AXIS */ 
+TITLE "Fig 7.12.3.2 Bivariate Analysis on LOAN_AMOUNT(Continuous variable) Versus LOAN_DURATION (Continuous variable) ";
+
+RUN;
+
+/****************************************************************** 
+7.12.4. UNIVARIATE ANALYSIS WITH MACRO ON TESTING DATASET
+ ******************************************************************/
+/************************************************************************************
+7.12.4.1. UNIVARIATE ANALYSIS WITH MACRO ON TESTING DATASET FOR CATEGORICAL VARIABLE
+ ***********************************************************************************/
+/* Create a copy of testing dataset */
+PROC SQL;
+
+CREATE TABLE MYLIB295.TESTING_DS_A AS
+SELECT *FROM MYLIB295.TESTING_DS;
+
+QUIT;
+
+/* Display a copy of testing dataset */
+%MACRO DISPLAY_TESTING_DS_A;
+
+PROC SQL; 
+
+SELECT *
+FROM MYLIB295.TESTING_DS_A;
+
+QUIT; 
+
+%MEND DISPLAY_TESTING_DS_A;
+%DISPLAY_TESTING_DS_A;
+
+/* starts */
+%MACRO UNIVARIATE_FOR_CATEGORICAL(DATASET_NAME, VARIABLE_NAME, TITLE_NAME);
+
+PROC FREQ DATA = &DATASET_NAME; 
+
+TABLE &VARIABLE_NAME; 
+TITLE &TITLE_NAME;
+
+QUIT; 
+
+%MEND UNIVARIATE_FOR_CATEGORICAL;
+/* ends */
+
+/* to call macro function */
+%UNIVARIATE_FOR_CATEGORICAL(MYLIB295.TESTING_DS_A, GENDER, "UNIVARIATE ANALYSIS ON GENDER");
+%UNIVARIATE_FOR_CATEGORICAL(MYLIB295.TESTING_DS_A, MARITAL_STATUS, "UNIVARIATE ANALYSIS ON MARITAL_STATUS");
+%UNIVARIATE_FOR_CATEGORICAL(MYLIB295.TESTING_DS_A, FAMILY_MEMBERS, "UNIVARIATE ANALYSIS ON FAMILY_MEMBERS");
+%UNIVARIATE_FOR_CATEGORICAL(MYLIB295.TESTING_DS_A, QUALIFICATION, "UNIVARIATE ANALYSIS ON QUALIFICATION");
+%UNIVARIATE_FOR_CATEGORICAL(MYLIB295.TESTING_DS_A, EMPLOYMENT, "UNIVARIATE ANALYSIS ON EMPLOYMENT");
+%UNIVARIATE_FOR_CATEGORICAL(MYLIB295.TESTING_DS_A, LOAN_LOCATION, "UNIVARIATE ANALYSIS ON LOAN_LOCATION");
+
+/************************************************************************************
+7.12.4.2. UNIVARIATE ANALYSIS WITH MACRO ON TESTING DATASET FOR CONTINUOUS VARIABLE
+ ***********************************************************************************/
+/* starts */
+%MACRO UNIVARIATE_FOR_CONTINUOUS(DATASET_NAME, VARIABLE_NAME, TITLE_NAME);
+
+PROC FREQ DATA = &DATASET_NAME; 
+
+TABLE &VARIABLE_NAME; 
+TITLE &TITLE_NAME;
+
+QUIT; 
+
+%MEND UNIVARIATE_FOR_CONTINUOUS;
+/* ends */
+
+/* to call macro function */
+%UNIVARIATE_FOR_CONTINUOUS(MYLIB295.TESTING_DS_A, CANDIDATE_INCOME, "UNIVARIATE ANALYSIS ON CANDIDATE_INCOME");
+%UNIVARIATE_FOR_CONTINUOUS(MYLIB295.TESTING_DS_A, CANDIDATE_INCOME, "UNIVARIATE ANALYSIS ON GUARANTEE_INCOME");
+%UNIVARIATE_FOR_CONTINUOUS(MYLIB295.TESTING_DS_A, LOAN_AMOUNT, "UNIVARIATE ANALYSIS ON LOAN_AMOUNT");
+%UNIVARIATE_FOR_CONTINUOUS(MYLIB295.TESTING_DS_A, LOAN_DURATION, "UNIVARIATE ANALYSIS ON LOAN_DURATION");
+%UNIVARIATE_FOR_CONTINUOUS(MYLIB295.TESTING_DS_A, LOAN_HISTORY, "UNIVARIATE ANALYSIS ON LOAN_HISTORY");
+
+/*********************************************************************************************************
+7.12.4.3. BIVARIATE ANALYSIS WITH MACRO ON TESTING DATASET FOR CATEGORICAL VARIABLE VS CATEGORICAL VARIABLE
+ **********************************************************************************************************/
+/* starts */
+%MACRO BIVARIATE_FOR_CAT_VS_CAT(P_DATASET_NAME, P_VAR_1, P_VAR_2, P_TITLE);
+
+PROC FREQ DATA = &P_DATASET_NAME;
+
+TABLE &P_VAR_1 * &P_VAR_2 /
+PLOTS = FREQPLOT(TWOWAY = STACKED SCALE = GROUPPCT );
+TITLE &P_TITLE;
+
+RUN;   
+
+/* ends */
+%MEND BIVARIATE_FOR_CAT_VS_CAT;
+
+/* to call macro function */
+%BIVARIATE_FOR_CAT_VS_CAT(MYLIB295.TESTING_DS_A, GENDER, FAMILY_MEMBERS,
+						"BIVARIATE ANALYSIS ON GENDER (CATEGORICAL VARIABLE) * FAMILY_MEMBERS (CATEGORICAL VARIABLE)");
+%BIVARIATE_FOR_CAT_VS_CAT(MYLIB295.TESTING_DS_A, FAMILY_MEMBERS, LOAN_LOCATION,
+						"BIVARIATE ANALYSIS ON FAMILY_MEMBERS (CATEGORICAL VARIABLE) * LOAN_LOCATION (CATEGORICAL VARIABLE)");
+
+/**********************************************************************************************************
+7.12.4.4. BIVARIATE ANALYSIS WITH MACRO ON TESTING DATASET FOR CATEGORICAL VARIABLE VS CONTINUOUS VARIABLE 
+ *********************************************************************************************************/
+/* starts */
+%MACRO BIVARIATE_FOR_CAT_VS_CON(P_DATASET_NAME, P_VAR_1, P_VAR_2, P_TITLE);
+
+PROC FREQ DATA =  &P_DATASET_NAME;
+
+TABLE &P_VAR_1 * &P_VAR_2 /
+PLOTS = FREQPLOT( TWOWAY = STACKED SCALE = GROUPPCT );
+TITLE &P_TITLE;
+
+RUN;   
+
+/* ends */
+%MEND BIVARIATE_FOR_CAT_VS_CON;
+
+/* to call macro function */
+%BIVARIATE_FOR_CAT_VS_CON(MYLIB295.TESTING_DS_A, LOAN_AMOUNT, LOAN_LOCATION, 
+						"BIVARIATE ANALYSIS ON LOAN_AMOUNT (CONTINUOUS VARIABLE) VS LOAN_LOCATION (CATEGORICAL VARIABLE)");
+%BIVARIATE_FOR_CAT_VS_CON(MYLIB295.TESTING_DS_A, LOAN_AMOUNT, FAMILY_MEMBERS,
+						"BIVARIATE ANALYSIS ON LOAN_AMOUNT (CONTINUOUS VARIABLE) VS FAMILY_MEMBERS (CATEGORICAL VARIABLE)");
+
+/**********************************************************************************************************
+7.12.4.5. BIVARIATE ANALYSIS WITH MACRO ON TESTING DATASET FOR CONTINUOUS VARIABLE VS CONTINUOUS VARIABLE 
+ *********************************************************************************************************/
+/* starts */
+%MACRO BIVARIATE_FOR_CON_VS_CON(P_DATASET_NAME, P_VAR_1, P_VAR_2, P_TITLE_1);
+
+PROC MEANS DATA =  &P_DATASET_NAME;
+
+CLASS &P_VAR_1;  /* NUMERIC*/
+VAR &P_VAR_2; /* NUMERIC*/
+TITLE &P_TITLE;
+
+RUN; 
+
+PROC SGPLOT DATA =  &P_DATASET_NAME;
+
+VBOX &P_VAR_1 / CATEGORY=&P_VAR_2;
+/*LD X-AXIS LA Y-AXIS */ 
+TITLE &P_TITLE;
+
+RUN;
+
+/* ends */
+%MEND BIVARIATE_FOR_CON_VS_CON;
+
+/* to call macro function */
+%BIVARIATE_FOR_CON_VS_CON (MYLIB295.TESTING_DS_A, LOAN_AMOUNT, LOAN_DURATION,
+						"BIVARIATE ANALYSIS ON LOAN_AMOUNT (CONTINUOUS VARIABLE) VS LOAN_DURATION (CONTINUOUS VARIABLE)");
+
+/*******************************************************************
+7.13. Imputation of Missing Values Found in Training_DS_A
+*******************************************************************/
+/* Make a copy of training dataset*/
+PROC SQL; 
+
+CREATE TABLE MYLIB295.TRAINING_DS_BI AS 
+SELECT *FROM MYLIB295.TRAINING_DS_A;
+
+QUIT;
+/*******************************************************************
+7.13.1. Imputation of Missing Values Found on Categorical Variable 
+********************************************************************/
+
+/*******************************************************************
+7.13.1.1. Imputation of Missing Values Found on Categorical Variable (GENDER)
+*******************************************************************/
+/* Before Imputation on GENDER variable */
+PROC FREQ DATA = MYLIB295.TRAINING_DS_BI; 
+
+TITLE "Fig 7.13.1.1 Before Imputation Missing Values on Variable GENDER ";
+TABLE GENDER; 
+
+RUN;
+
+/* To Show How Many Missing Values */
+PROC SQL; 
+
+SELECT * FROM MYLIB295.TRAINING_DS_BI t
+WHERE ((t.GENDER EQ " ") OR 
+	  (t.GENDER IS NULL));
+
+QUIT;
+
+PROC SQL; 
+
+SELECT COUNT(*) LABEL = "NUMBER OF MISSING VALUES IN VARIABLE GENDER"
+FROM MYLIB295.TRAINING_DS_BI t
+WHERE ((t.GENDER EQ " ") OR 
+	  (t.GENDER IS NULL));
+	  
+QUIT;
+
+/* Step 1a: to display each gender */
+PROC SQL; 
+
+SELECT t.GENDER AS GENDER_NAME, COUNT(*) AS COUNTS 
+FROM MYLIB295.TRAINING_DS_BI t
+WHERE ((t.GENDER NE " ") OR 
+	   (t.GENDER IS NOT NULL))
+GROUP BY t.GENDER; 
+
+QUIT; 
+
+/* Step 1b: to create gender table */
+PROC SQL; 
+
+CREATE TABLE MYLIB295.TRAINING_DS_BI_GENDER AS 
+SELECT t.GENDER AS GENDER_NAME, COUNT(*) AS COUNTS 
+FROM MYLIB295.TRAINING_DS_BI t
+WHERE ((t.GENDER NE " ") OR 
+	   (t.GENDER IS NOT NULL))
+GROUP BY t.GENDER; 
+
+QUIT; 
+
+/* Step 2: To display newly created MYLIB295.TRAINING_DS_BI_GENDER */
+PROC SQL; 
+
+SELECT *FROM MYLIB295.TRAINING_DS_BI_GENDER;
+
+QUIT;
+
+/* Step 3: To find mod */
+PROC SQL; 
+
+SELECT to.GENDER_NAME AS GENDER 
+FROM MYLIB295.TRAINING_DS_BI_GENDER to
+WHERE to.COUNTS EQ (SELECT MAX(ti.COUNTS) AS THE_HIGHEST_MOD
+					FROM MYLIB295.TRAINING_DS_BI_GENDER ti);
+
+QUIT;
+
+/* Step 4: create after imputation table */
+PROC SQL;
+
+CREATE TABLE MYLIB295.TRAINING_DS_FI_G AS 
+SELECT *FROM MYLIB295.TRAINING_DS_BI;
+
+QUIT;
+
+/*Step 5: Impute missing values*/
+PROC SQL; 
+
+UPDATE MYLIB295.TRAINING_DS_FI_G
+SET GENDER = (SELECT to.GENDER_NAME AS GENDER 
+			 FROM MYLIB295.TRAINING_DS_BI_GENDER to 
+			 WHERE to.COUNTS EQ(SELECT MAX(ti.COUNTS) AS THE_HIGHEST_MOD
+			 					FROM MYLIB295.TRAINING_DS_BI_GENDER ti))
+WHERE ((GENDER EQ "") OR 
+		(GENDER IS NULL));
+
+QUIT;
+
+/* After imputation */
+PROC FREQ DATA = MYLIB295.TRAINING_DS_FI_G; 
+
+TITLE "Fig 7.13.1.1 After Imputation Missing Values on Variable GENDER ";
+TABLE GENDER; 
+
+RUN; 
+
+/* To Show How Many Missing Values */
+PROC SQL; 
+
+SELECT * FROM MYLIB295.TRAINING_DS_FI_G t
+WHERE ((t.GENDER EQ " ") OR 
+	  (t.GENDER IS NULL));
+
+QUIT;
+
+PROC SQL; 
+
+SELECT COUNT(*) LABEL = "NUMBER OF MISSING VALUES IN VARIABLE GENDER"
+FROM MYLIB295.TRAINING_DS_FI_G t
+WHERE ((t.GENDER EQ " ") OR 
+	  	(t.GENDER IS NULL));
+	  
+QUIT;
+
+/* to display imputted table for variable GENDER*/
+PROC SQL; 
+
+SELECT *FROM MYLIB295.TRAINING_DS_FI_G;
+
+QUIT;
+
+/***********************************************************************************
+7.13.1.2. Imputation of Missing Values Found on Categorical Variable (MARITAL_STATUS)
+************************************************************************************/
+/* Before Imputation on MARITAL_STATUS variable */
+PROC FREQ DATA = MYLIB295.TRAINING_DS_FI_G; 
+
+TITLE "Fig 7.13.1.2 Before Imputation Missing Values on Variable MARITAL_STATUS ";
+TABLE MARITAL_STATUS; 
+
+RUN;
+
+/* To Show How Many Missing Values */
+PROC SQL; 
+
+SELECT * FROM MYLIB295.TRAINING_DS_FI_G t
+WHERE ((t.MARITAL_STATUS EQ " ") OR 
+	  (t.MARITAL_STATUS IS NULL));
+
+QUIT;
+
+PROC SQL; 
+
+SELECT COUNT(*) LABEL = "NUMBER OF MISSING VALUES IN VARIABLE MARITAL_STATUS"
+FROM MYLIB295.TRAINING_DS_FI_G t
+WHERE ((t.MARITAL_STATUS EQ " ") OR 
+	  (t.MARITAL_STATUS IS NULL));
+	  
+QUIT;
+
+/* Step 1a: to display each MARITAL_STATUS */
+PROC SQL; 
+
+SELECT t.MARITAL_STATUS AS STATUS, COUNT(*) AS COUNTS 
+FROM MYLIB295.TRAINING_DS_FI_G t
+WHERE ((t.MARITAL_STATUS NE " ") OR 
+	   (t.MARITAL_STATUS IS NOT NULL))
+GROUP BY t.MARITAL_STATUS; 
+
+QUIT; 
+
+/* Step 1b: to create MARITAL_STATUS table */
+PROC SQL; 
+
+CREATE TABLE MYLIB295.TRAINING_DS_BI_MARITAL_STATUS AS 
+SELECT t.MARITAL_STATUS AS STATUS, COUNT(*) AS COUNTS 
+FROM MYLIB295.TRAINING_DS_FI_G t
+WHERE ((t.MARITAL_STATUS NE " ") OR 
+	   (t.MARITAL_STATUS IS NOT NULL))
+GROUP BY t.MARITAL_STATUS; 
+
+QUIT; 
+
+/* Step 2: To display newly created MYLIB295.TRAINING_DS_BI_MARITAL_STATUS */
+PROC SQL; 
+
+SELECT *FROM MYLIB295.TRAINING_DS_BI_MARITAL_STATUS;
+
+QUIT;
+
+/* Step 3: To find mod */
+PROC SQL; 
+
+SELECT to.STATUS AS MARITAL_STATUS
+FROM MYLIB295.TRAINING_DS_BI_MARITAL_STATUS to
+WHERE to.COUNTS EQ (SELECT MAX(ti.COUNTS) AS THE_HIGHEST_MOD
+					FROM MYLIB295.TRAINING_DS_BI_MARITAL_STATUS ti);
+
+QUIT;
+
+/* Step 4: create after imputation table */
+PROC SQL;
+
+CREATE TABLE MYLIB295.TRAINING_DS_FI_MS AS 
+SELECT *FROM MYLIB295.TRAINING_DS_FI_G;
+
+QUIT;
+
+/*Step 5: Impute missing values*/
+PROC SQL; 
+
+UPDATE MYLIB295.TRAINING_DS_FI_MS
+SET MARITAL_STATUS = (SELECT to.STATUS AS MARITAL_STATUS
+			 FROM MYLIB295.TRAINING_DS_BI_MARITAL_STATUS to 
+			 WHERE to.COUNTS EQ(SELECT MAX(ti.COUNTS) AS THE_HIGHEST_MOD
+			 					FROM MYLIB295.TRAINING_DS_BI_MARITAL_STATUS ti))
+WHERE ((MARITAL_STATUS EQ "") OR 
+		(MARITAL_STATUS IS NULL));
+
+QUIT;
+
+/* After imputation */
+PROC FREQ DATA = MYLIB295.TRAINING_DS_FI_MS; 
+
+TITLE "Fig 7.13.1.2 After Imputation Missing Values on Variable MARITAL_STATUS ";
+TABLE MARITAL_STATUS; 
+
+RUN; 
+
+/* To Show How Many Missing Values */
+PROC SQL; 
+
+SELECT * FROM MYLIB295.TRAINING_DS_FI_MS t
+WHERE ((t.MARITAL_STATUS EQ " ") OR 
+	  (t.MARITAL_STATUS IS NULL));
+
+QUIT;
+
+PROC SQL; 
+
+SELECT COUNT(*) LABEL = "NUMBER OF MISSING VALUES IN VARIABLE MARITAL_STATUS"
+FROM MYLIB295.TRAINING_DS_FI_MS t
+WHERE ((t.MARITAL_STATUS EQ " ") OR 
+	  	(t.MARITAL_STATUS IS NULL));
+	  
+QUIT;
+
+/* to display imputted table for variable MARITAL_STATUS*/
+PROC SQL; 
+
+SELECT *FROM MYLIB295.TRAINING_DS_FI_MS;
+
+QUIT;
+
+/***********************************************************************************
+7.13.1.3. Imputation of Missing Values Found on Categorical Variable (FAMILY_MEMBERS)
+************************************************************************************/
+/* Before Imputation on FAMILY_MEMBERS variable */
+PROC FREQ DATA = MYLIB295.TRAINING_DS_FI_MS; 
+
+TITLE "Fig 7.13.1.3 Before Imputation Missing Values on Variable FAMILY_MEMBERS ";
+TABLE FAMILY_MEMBERS; 
+
+RUN;
+
+/* To Show How Many Missing Values */
+PROC SQL; 
+
+SELECT * FROM MYLIB295.TRAINING_DS_FI_MS t
+WHERE ((t.FAMILY_MEMBERS EQ " ") OR 
+	  (t.FAMILY_MEMBERS IS NULL));
+
+QUIT;
+
+PROC SQL; 
+
+SELECT COUNT(*) LABEL = "NUMBER OF MISSING VALUES IN VARIABLE FAMILY_MEMBERS"
+FROM MYLIB295.TRAINING_DS_FI_MS t
+WHERE ((t.FAMILY_MEMBERS EQ " ") OR 
+	  (t.FAMILY_MEMBERS IS NULL));
+	  
+QUIT;
+
+/* Step 1a: to display each FAMILY_MEMBERS */
+PROC SQL; 
+
+SELECT t.FAMILY_MEMBERS AS MEMBERS_OF_FAMILY, COUNT(*) AS COUNTS 
+FROM MYLIB295.TRAINING_DS_FI_MS t
+WHERE ((t.FAMILY_MEMBERS NE " ") OR 
+	   (t.FAMILY_MEMBERS IS NOT NULL))
+GROUP BY t.FAMILY_MEMBERS; 
+
+QUIT; 
+
+/* Step 1b: to create FAMILY_MEMBERS table */
+PROC SQL; 
+
+CREATE TABLE MYLIB295.TRAINING_DS_BI_FAMILY_MEMBERS AS 
+SELECT t.FAMILY_MEMBERS AS MEMBERS_OF_FAMILY, COUNT(*) AS COUNTS 
+FROM MYLIB295.TRAINING_DS_FI_MS t
+WHERE ((t.FAMILY_MEMBERS NE " ") OR 
+	   (t.FAMILY_MEMBERS IS NOT NULL))
+GROUP BY t.FAMILY_MEMBERS; 
+
+QUIT; 
+
+/* Step 2: To display newly created MYLIB295.TRAINING_DS_BI_FAMILY_MEMBERS */
+PROC SQL; 
+
+SELECT *FROM MYLIB295.TRAINING_DS_BI_FAMILY_MEMBERS;
+
+QUIT;
+
+/* Step 3: To find mod */
+PROC SQL; 
+
+SELECT to.MEMBERS_OF_FAMILY AS FAMILY_MEMBERS
+FROM MYLIB295.TRAINING_DS_BI_FAMILY_MEMBERS to
+WHERE to.COUNTS EQ (SELECT MAX(ti.COUNTS) AS THE_HIGHEST_MOD
+					FROM MYLIB295.TRAINING_DS_BI_FAMILY_MEMBERS ti);
+
+QUIT;
+
+/* Step 4: create after imputation table */
+PROC SQL;
+
+CREATE TABLE MYLIB295.TRAINING_DS_FI_FM AS 
+SELECT *FROM MYLIB295.TRAINING_DS_FI_MS;
+
+QUIT;
+
+/*Step 5: Impute missing values*/
+PROC SQL; 
+
+UPDATE MYLIB295.TRAINING_DS_FI_FM
+SET FAMILY_MEMBERS = (SELECT to.MEMBERS_OF_FAMILY AS FAMILY_MEMBERS
+			 FROM MYLIB295.TRAINING_DS_BI_FAMILY_MEMBERS to 
+			 WHERE to.COUNTS EQ(SELECT MAX(ti.COUNTS) AS THE_HIGHEST_MOD
+			 					FROM MYLIB295.TRAINING_DS_BI_FAMILY_MEMBERS ti))
+WHERE ((FAMILY_MEMBERS EQ "") OR 
+		(FAMILY_MEMBERS IS NULL));
+
+QUIT;
+
+/* After imputation */
+PROC FREQ DATA = MYLIB295.TRAINING_DS_FI_FM; 
+
+TITLE "Fig 7.13.1.3 After Imputation Missing Values on Variable FAMILY_MEMBERS";
+TABLE FAMILY_MEMBERS; 
+
+RUN; 
+
+/* To Show How Many Missing Values */
+PROC SQL; 
+
+SELECT * FROM MYLIB295.TRAINING_DS_FI_FM t
+WHERE ((t.FAMILY_MEMBERS EQ " ") OR 
+	  (t.FAMILY_MEMBERS IS NULL));
+
+QUIT;
+
+PROC SQL; 
+
+SELECT COUNT(*) LABEL = "NUMBER OF MISSING VALUES IN VARIABLE FAMILY_MEMBERS"
+FROM MYLIB295.TRAINING_DS_FI_FM t
+WHERE ((t.FAMILY_MEMBERS EQ " ") OR 
+	  	(t.FAMILY_MEMBERS IS NULL));
+	  
+QUIT;
+
+/* to display imputted table for variable FAMILY_MEMBERS*/
+PROC SQL; 
+
+SELECT *FROM MYLIB295.TRAINING_DS_FI_FM;
+
+QUIT;
+
+/***********************************************************************************
+7.13.1.4. Imputation of Missing Values Found on Categorical Variable (QUALIFICATION)
+************************************************************************************/
+/* Before Imputation on QUALIFICATION variable */
+PROC FREQ DATA = MYLIB295.TRAINING_DS_FI_FM; 
+
+TITLE "Fig 7.13.1.4 Before Imputation Missing Values on Variable QUALIFICATION ";
+TABLE QUALIFICATION; 
+
+RUN;
+
+/* To Show How Many Missing Values */
+PROC SQL; 
+
+SELECT * FROM MYLIB295.TRAINING_DS_FI_FM t
+WHERE ((t.QUALIFICATION EQ " ") OR 
+	  (t.QUALIFICATION IS NULL));
+
+QUIT;
+
+PROC SQL; 
+
+SELECT COUNT(*) LABEL = "NUMBER OF MISSING VALUES IN VARIABLE QUALIFICATION"
+FROM MYLIB295.TRAINING_DS_FI_FM t
+WHERE ((t.QUALIFICATION EQ " ") OR 
+	  (t.QUALIFICATION IS NULL));
+	  
+QUIT;
+
+/***********************************************************************************
+7.13.1.5. Imputation of Missing Values Found on Categorical Variable (EMPLOYMENT)
+************************************************************************************/
+/* Before Imputation on EMPLOYMENT variable */
+PROC FREQ DATA = MYLIB295.TRAINING_DS_FI_FM; 
+
+TITLE "Fig 7.13.1.5 Before Imputation Missing Values on Variable EMPLOYMENT ";
+TABLE EMPLOYMENT; 
+
+RUN;
+
+/* To Show How Many Missing Values */
+PROC SQL; 
+
+SELECT * FROM MYLIB295.TRAINING_DS_FI_FM t
+WHERE ((t.EMPLOYMENT EQ " ") OR 
+	  (t.EMPLOYMENT IS NULL));
+
+QUIT;
+
+PROC SQL; 
+
+SELECT COUNT(*) LABEL = "NUMBER OF MISSING VALUES IN VARIABLE EMPLOYMENT"
+FROM MYLIB295.TRAINING_DS_FI_FM t
+WHERE ((t.EMPLOYMENT EQ " ") OR 
+	  (t.EMPLOYMENT IS NULL));
+	  
+QUIT;
+
+/* Step 1a: to display each EMPLOYMENT */
+PROC SQL; 
+
+SELECT t.EMPLOYMENT AS EMPLOYMENT, COUNT(*) AS COUNTS 
+FROM MYLIB295.TRAINING_DS_FI_FM t
+WHERE ((t.EMPLOYMENT NE " ") OR 
+	   (t.EMPLOYMENT IS NOT NULL))
+GROUP BY t.EMPLOYMENT; 
+
+QUIT; 
+
+/* Step 1b: to create EMPLOYMENT table */
+PROC SQL; 
+
+CREATE TABLE MYLIB295.TRAINING_DS_BI_EMPLOYMENT AS 
+SELECT t.EMPLOYMENT AS EMPLOYMENT, COUNT(*) AS COUNTS 
+FROM MYLIB295.TRAINING_DS_FI_FM t
+WHERE ((t.EMPLOYMENT NE " ") OR 
+	   (t.EMPLOYMENT IS NOT NULL))
+GROUP BY t.EMPLOYMENT; 
+
+QUIT; 
+
+/* Step 2: To display newly created MYLIB295.TRAINING_DS_BI_EMPLOYMENT */
+PROC SQL; 
+
+SELECT *FROM MYLIB295.TRAINING_DS_BI_EMPLOYMENT;
+
+QUIT;
+
+/* Step 3: To find mod */
+PROC SQL; 
+
+SELECT to.EMPLOYMENT AS EMPLOYMENT
+FROM MYLIB295.TRAINING_DS_BI_EMPLOYMENT to
+WHERE to.COUNTS EQ (SELECT MAX(ti.COUNTS) AS THE_HIGHEST_MOD
+					FROM MYLIB295.TRAINING_DS_BI_EMPLOYMENT ti);
+
+QUIT;
+
+/* Step 4: create after imputation table */
+PROC SQL;
+
+CREATE TABLE MYLIB295.TRAINING_DS_FI_E AS 
+SELECT *FROM MYLIB295.TRAINING_DS_FI_FM;
+
+QUIT;
+
+/*Step 5: Impute missing values*/
+PROC SQL; 
+
+UPDATE MYLIB295.TRAINING_DS_FI_E
+SET EMPLOYMENT = (SELECT to.EMPLOYMENT AS EMPLOYMENT
+			 FROM MYLIB295.TRAINING_DS_BI_EMPLOYMENT to 
+			 WHERE to.COUNTS EQ(SELECT MAX(ti.COUNTS) AS THE_HIGHEST_MOD
+			 					FROM MYLIB295.TRAINING_DS_BI_EMPLOYMENT ti))
+WHERE ((EMPLOYMENT EQ "") OR 
+		(EMPLOYMENT IS NULL));
+
+QUIT;
+
+/* After imputation */
+PROC FREQ DATA = MYLIB295.TRAINING_DS_FI_E; 
+
+TITLE "Fig 7.13.1.5 After Imputation Missing Values on Variable EMPLOYMENT";
+TABLE EMPLOYMENT; 
+
+RUN; 
+
+/* To Show How Many Missing Values */
+PROC SQL; 
+
+SELECT * FROM MYLIB295.TRAINING_DS_FI_E t
+WHERE ((t.EMPLOYMENT EQ " ") OR 
+	  (t.EMPLOYMENT IS NULL));
+
+QUIT;
+
+PROC SQL; 
+
+SELECT COUNT(*) LABEL = "NUMBER OF MISSING VALUES IN VARIABLE EMPLOYMENT"
+FROM MYLIB295.TRAINING_DS_FI_E t
+WHERE ((t.EMPLOYMENT EQ " ") OR 
+	  	(t.EMPLOYMENT IS NULL));
+	  
+QUIT;
+
+/* to display imputted table for variable EMPLOYMENT*/
+PROC SQL; 
+
+SELECT *FROM MYLIB295.TRAINING_DS_FI_E;
+
+QUIT;
+
+/***********************************************************************************
+7.13.1.6. Imputation of Missing Values Found on Categorical Variable (LOAN_LOCATION)
+************************************************************************************/
+/* Before Imputation on LOAN_LOCATION variable */
+PROC FREQ DATA = MYLIB295.TRAINING_DS_FI_E; 
+
+TITLE "Fig 7.13.1.6 Before Imputation Missing Values on Variable LOAN_LOCATION";
+TABLE LOAN_LOCATION; 
+
+RUN;
+
+/* To Show How Many Missing Values */
+PROC SQL; 
+
+SELECT * FROM MYLIB295.TRAINING_DS_FI_E t
+WHERE ((t.LOAN_LOCATION EQ " ") OR 
+	  (t.LOAN_LOCATION IS NULL));
+
+QUIT;
+
+PROC SQL; 
+
+SELECT COUNT(*) LABEL = "NUMBER OF MISSING VALUES IN VARIABLE LOAN_LOCATION"
+FROM MYLIB295.TRAINING_DS_FI_E t
+WHERE ((t.LOAN_LOCATION EQ " ") OR 
+	  (t.LOAN_LOCATION IS NULL));
+	  
+QUIT;
+
+/***********************************************************************************
+7.13.1.7. Imputation of Missing Values Found on Categorical Variable (LOAN_APPROVAL_STATUS)
+************************************************************************************/
+/* Before Imputation on LOAN_APPROVAL_STATUS variable */
+PROC FREQ DATA = MYLIB295.TRAINING_DS_FI_E; 
+
+TITLE "Fig 7.13.1.7 Before Imputation Missing Values on Variable LOAN_APPROVAL_STATUS";
+TABLE LOAN_APPROVAL_STATUS; 
+
+RUN;
+
+/* To Show How Many Missing Values */
+PROC SQL; 
+
+SELECT * FROM MYLIB295.TRAINING_DS_FI_E t
+WHERE ((t.LOAN_APPROVAL_STATUS EQ " ") OR 
+	  (t.LOAN_APPROVAL_STATUS IS NULL));
+
+QUIT;
+
+PROC SQL; 
+
+SELECT COUNT(*) LABEL = "NUMBER OF MISSING VALUES IN VARIABLE LOAN_APPROVAL_STATUS"
+FROM MYLIB295.TRAINING_DS_FI_E t
+WHERE ((t.LOAN_APPROVAL_STATUS EQ " ") OR 
+	  (t.LOAN_APPROVAL_STATUS IS NULL));
+	  
+QUIT;
+
+/* TRAINING DATA FOR CATEGORICAL VARIABLES ARE CLEANED */
+/* LIB USED IS MYLIB295.TRAINING_DS_FI_E */
+
+/******************************************************************************
+7.13.2. Imputation of Missing Values Found on Continuous Variable
+******************************************************************************/
+
+/**************************************************************
+7.13.2.1 Imputation of Missing Values Found in CANDIDATE_INCOME
+**************************************************************/
+/* To show missing values in CANDIDATE_INCOME */
+PROC SQL; 
+
+SELECT *
+FROM MYLIB295.TRAINING_DS_FI_E
+WHERE (CANDIDATE_INCOME EQ . );
+
+QUIT;
+
+PROC SQL;
+
+SELECT COUNT(*) AS MISSING_OBSERVATIONS FROM MYLIB295.TRAINING_DS_FI_E
+WHERE (CANDIDATE_INCOME EQ . );
+
+QUIT;
+
+/**************************************************************
+7.13.2.2 Imputation of Missing Values Found in GUARANTEE_INCOME
+**************************************************************/
+/* To show missing values in GUARANTEE_INCOME */
+PROC SQL; 
+
+SELECT *
+FROM MYLIB295.TRAINING_DS_FI_E
+WHERE (GUARANTEE_INCOME EQ . );
+
+QUIT;
+
+PROC SQL;
+
+SELECT COUNT(*) AS MISSING_OBSERVATIONS FROM MYLIB295.TRAINING_DS_FI_E
+WHERE (GUARANTEE_INCOME EQ . );
+
+QUIT;
+
+/**************************************************************
+7.13.2.3 Imputation of Missing Values Found in LOAN_AMOUNT 
+**************************************************************/
+/* To show missing values in LOAN_AMOUNT */
+PROC SQL; 
+
+SELECT *
+FROM MYLIB295.TRAINING_DS_FI_E
+WHERE (LOAN_AMOUNT EQ . );
+
+QUIT;
+
+PROC SQL;
+
+SELECT COUNT(*) AS MISSING_OBSERVATIONS FROM MYLIB295.TRAINING_DS_FI_E
+WHERE (LOAN_AMOUNT EQ . );
+
+QUIT;
+
+/* impute with mean */
+PROC STDIZE DATA = MYLIB295.TRAINING_DS_FI_E REPONLY
+METHOD = MEAN OUT = MYLIB295.TRAINING_DS_FI_LA; 
+VAR LOAN_AMOUNT; 
+
+QUIT;  
+
+/* count missing observations in LOAN_AMOUNT */
+PROC SQL;
+
+SELECT COUNT(*) AS MISSING_OBSERVATIONS FROM MYLIB295.TRAINING_DS_FI_LA
+WHERE (LOAN_AMOUNT EQ . );
+
+QUIT;
+
+/**************************************************************
+7.13.2.4 Imputation of Missing Values Found in LOAN_DURATION
+**************************************************************/
+/* To show missing values in LOAN_DURATION */
+PROC SQL; 
+
+SELECT *
+FROM MYLIB295.TRAINING_DS_FI_LA
+WHERE (LOAN_DURATION EQ . );
+
+QUIT;
+
+PROC SQL;
+
+SELECT COUNT(*) AS MISSING_OBSERVATIONS FROM MYLIB295.TRAINING_DS_FI_LA
+WHERE (LOAN_DURATION EQ . );
+
+QUIT;
+
+/* impute with mean */
+PROC STDIZE DATA = MYLIB295.TRAINING_DS_FI_LA REPONLY
+METHOD = MEAN OUT = MYLIB295.TRAINING_DS_FI_LD; 
+VAR LOAN_DURATION; 
+
+QUIT;  
+
+/* count missing observations in LOAN_DURATION */
+PROC SQL;
+
+SELECT COUNT(*) AS MISSING_OBSERVATIONS FROM MYLIB295.TRAINING_DS_FI_LD
+WHERE (LOAN_DURATION EQ . );
+
+QUIT;
+
+/**************************************************************
+7.13.2.5 Imputation of Missing Values Found in LOAN_HISTORY
+**************************************************************/
+/* To show missing values in LOAN_HISTORY */
+PROC SQL; 
+
+SELECT *
+FROM MYLIB295.TRAINING_DS_FI_LD
+WHERE (LOAN_HISTORY EQ . );
+
+QUIT;
+
+PROC SQL;
+
+SELECT COUNT(*) AS MISSING_OBSERVATIONS FROM MYLIB295.TRAINING_DS_FI_LD
+WHERE (LOAN_HISTORY EQ . );
+
+QUIT;
+
+/* impute with mean */
+PROC STDIZE DATA = MYLIB295.TRAINING_DS_FI_LD REPONLY
+METHOD = MEAN OUT = MYLIB295.TRAINING_DS_FI_LH; 
+VAR LOAN_HISTORY; 
+
+QUIT;  
+
+/* count missing observations in LOAN_HISTORY */
+PROC SQL;
+
+SELECT COUNT(*) AS MISSING_OBSERVATIONS FROM MYLIB295.TRAINING_DS_FI_LH
+WHERE (LOAN_HISTORY EQ . );
+
+QUIT;
+
+/* TRAINING DATA FOR CATEGORICAL AND CONTINUOUS VARIABLES ARE CLEANED */
+/* LIBRARY USED IS MYLIB295.TRAINING_DS_FI_LH */
+
+
+/*******************************************************************
+7.14. Imputation of Missing Values Found in TESTING_DS_A
+*******************************************************************/
+/* Make a copy of testing dataset*/
+PROC SQL; 
+
+CREATE TABLE MYLIB295.TESTING_DS_BI AS 
+SELECT *FROM MYLIB295.TESTING_DS_A;
+
+QUIT;
+
+/*******************************************************************
+7.14.1. Imputation of Missing Values Found on Categorical Variable (GENDER)
+*******************************************************************/
+/* Before Imputation on GENDER variable */
+PROC FREQ DATA = MYLIB295.TESTING_DS_BI; 
+
+TITLE "Fig 7.14.1. Before Imputation Missing Values on Variable GENDER ";
+TABLE GENDER; 
+
+RUN;
+
+/* To Show How Many Missing Values */
+PROC SQL; 
+
+SELECT * FROM MYLIB295.TESTING_DS_BI t
+WHERE ((t.GENDER EQ " ") OR 
+	  (t.GENDER IS NULL));
+
+QUIT;
+
+PROC SQL; 
+
+SELECT COUNT(*) LABEL = "NUMBER OF MISSING VALUES IN VARIABLE GENDER"
+FROM MYLIB295.TESTING_DS_BI t
+WHERE ((t.GENDER EQ " ") OR 
+	  (t.GENDER IS NULL));
+	  
+QUIT;
+
+/* Step 1a: to display each gender */
+PROC SQL; 
+
+SELECT t.GENDER AS GENDER_NAME, COUNT(*) AS COUNTS 
+FROM MYLIB295.TESTING_DS_BI t
+WHERE ((t.GENDER NE " ") OR 
+	   (t.GENDER IS NOT NULL))
+GROUP BY t.GENDER; 
+
+QUIT; 
+
+/* Step 1b: to create gender table */
+PROC SQL; 
+
+CREATE TABLE MYLIB295.TESTING_DS_BI_GENDER AS 
+SELECT t.GENDER AS GENDER_NAME, COUNT(*) AS COUNTS 
+FROM MYLIB295.TESTING_DS_BI t
+WHERE ((t.GENDER NE " ") OR 
+	   (t.GENDER IS NOT NULL))
+GROUP BY t.GENDER; 
+
+QUIT; 
+
+/* Step 2: To display newly created MYLIB295.TRAINING_DS_BI_GENDER */
+PROC SQL; 
+
+SELECT *FROM MYLIB295.TESTING_DS_BI_GENDER;
+
+QUIT;
+
+/* Step 3: To find mod */
+PROC SQL; 
+
+SELECT to.GENDER_NAME AS GENDER 
+FROM MYLIB295.TESTING_DS_BI_GENDER to
+WHERE to.COUNTS EQ (SELECT MAX(ti.COUNTS) AS THE_HIGHEST_MOD
+					FROM MYLIB295.TESTING_DS_BI_GENDER ti);
+
+QUIT;
+
+/* Step 4: create after imputation table */
+PROC SQL;
+
+CREATE TABLE MYLIB295.TESTING_DS_FI_G AS 
+SELECT *FROM MYLIB295.TESTING_DS_BI;
+
+QUIT;
+
+/*Step 5: Impute missing values*/
+PROC SQL; 
+
+UPDATE MYLIB295.TESTING_DS_FI_G
+SET GENDER = (SELECT to.GENDER_NAME AS GENDER 
+			 FROM MYLIB295.TESTING_DS_BI_GENDER to 
+			 WHERE to.COUNTS EQ(SELECT MAX(ti.COUNTS) AS THE_HIGHEST_MOD
+			 					FROM MYLIB295.TESTING_DS_BI_GENDER ti))
+WHERE ((GENDER EQ "") OR 
+		(GENDER IS NULL));
+
+QUIT;
+
+/* After imputation */
+PROC FREQ DATA = MYLIB295.TESTING_DS_FI_G; 
+
+TITLE "Fig 7.14.1 After Imputation Missing Values on Variable GENDER ";
+TABLE GENDER; 
+
+RUN; 
+
+/* To Show How Many Missing Values */
+PROC SQL; 
+
+SELECT * FROM MYLIB295.TESTING_DS_FI_G t
+WHERE ((t.GENDER EQ " ") OR 
+	  (t.GENDER IS NULL));
+
+QUIT;
+
+PROC SQL; 
+
+SELECT COUNT(*) LABEL = "NUMBER OF MISSING VALUES IN VARIABLE GENDER"
+FROM MYLIB295.TESTING_DS_FI_G t
+WHERE ((t.GENDER EQ " ") OR 
+	  	(t.GENDER IS NULL));
+	  
+QUIT;
+
+/* to display imputted table for variable GENDER*/
+PROC SQL; 
+
+SELECT *FROM MYLIB295.TESTING_DS_FI_G;
+
+QUIT;
+
+/***********************************************************************************
+7.14.2. Imputation of Missing Values Found on Categorical Variable (MARITAL_STATUS)
+************************************************************************************/
+/* Before Imputation on MARITAL_STATUS variable */
+PROC FREQ DATA = MYLIB295.TESTING_DS_FI_G; 
+
+TITLE "Fig 7.14.2 Before Imputation Missing Values on Variable MARITAL_STATUS ";
+TABLE MARITAL_STATUS; 
+
+RUN;
+
+/* To Show How Many Missing Values */
+PROC SQL; 
+
+SELECT * FROM MYLIB295.TESTING_DS_FI_G t
+WHERE ((t.MARITAL_STATUS EQ " ") OR 
+	  (t.MARITAL_STATUS IS NULL));
+
+QUIT;
+
+PROC SQL; 
+
+SELECT COUNT(*) LABEL = "NUMBER OF MISSING VALUES IN VARIABLE MARITAL_STATUS"
+FROM MYLIB295.TESTING_DS_FI_G t
+WHERE ((t.MARITAL_STATUS EQ " ") OR 
+	  (t.MARITAL_STATUS IS NULL));
+	  
+QUIT;
+
+/***********************************************************************************
+7.14.4 Imputation of Missing Values Found on Categorical Variable (QUALIFICATION)
+************************************************************************************/
+/* Before Imputation on QUALIFICATION variable */
+PROC FREQ DATA = MYLIB295.TESTING_DS_FI_FM; 
+
+TITLE "Fig 7.14.4 Before Imputation Missing Values on Variable QUALIFICATION ";
+TABLE QUALIFICATION; 
+
+RUN;
+
+/* To Show How Many Missing Values */
+PROC SQL; 
+
+SELECT * FROM MYLIB295.TESTING_DS_FI_FM t
+WHERE ((t.QUALIFICATION EQ " ") OR 
+	  (t.QUALIFICATION IS NULL));
+
+QUIT;
+
+PROC SQL; 
+
+SELECT COUNT(*) LABEL = "NUMBER OF MISSING VALUES IN VARIABLE QUALIFICATION"
+FROM MYLIB295.TESTING_DS_FI_FM t
+WHERE ((t.QUALIFICATION EQ " ") OR 
+	  (t.QUALIFICATION IS NULL));
+	  
+QUIT;
+
+/***********************************************************************************
+7.14.3. Imputation of Missing Values Found on Categorical Variable (FAMILY_MEMBERS)
+************************************************************************************/
+/* Before Imputation on FAMILY_MEMBERS variable */
+PROC FREQ DATA = MYLIB295.TESTING_DS_FI_G; 
+
+TITLE "Fig 7.14.3 Before Imputation Missing Values on Variable FAMILY_MEMBERS ";
+TABLE FAMILY_MEMBERS; 
+
+RUN;
+
+/* To Show How Many Missing Values */
+PROC SQL; 
+
+SELECT * FROM MYLIB295.TESTING_DS_FI_G t
+WHERE ((t.FAMILY_MEMBERS EQ " ") OR 
+	  (t.FAMILY_MEMBERS IS NULL));
+
+QUIT;
+
+PROC SQL; 
+
+SELECT COUNT(*) LABEL = "NUMBER OF MISSING VALUES IN VARIABLE FAMILY_MEMBERS"
+FROM MYLIB295.TESTING_DS_FI_G t
+WHERE ((t.FAMILY_MEMBERS EQ " ") OR 
+	  (t.FAMILY_MEMBERS IS NULL));
+	  
+QUIT;
+
+/* Step 1a: to display each FAMILY_MEMBERS */
+PROC SQL; 
+
+SELECT t.FAMILY_MEMBERS AS MEMBERS_OF_FAMILY, COUNT(*) AS COUNTS 
+FROM MYLIB295.TESTING_DS_FI_G t
+WHERE ((t.FAMILY_MEMBERS NE " ") OR 
+	   (t.FAMILY_MEMBERS IS NOT NULL))
+GROUP BY t.FAMILY_MEMBERS; 
+
+QUIT; 
+
+/* Step 1b: to create FAMILY_MEMBERS table */
+PROC SQL; 
+
+CREATE TABLE MYLIB295.TESTING_DS_BI_FAMILY_MEMBERS AS 
+SELECT t.FAMILY_MEMBERS AS MEMBERS_OF_FAMILY, COUNT(*) AS COUNTS 
+FROM MYLIB295.TESTING_DS_FI_G t
+WHERE ((t.FAMILY_MEMBERS NE " ") OR 
+	   (t.FAMILY_MEMBERS IS NOT NULL))
+GROUP BY t.FAMILY_MEMBERS; 
+
+QUIT; 
+
+/* Step 2: To display newly created MYLIB295.TESTING_DS_BI_FAMILY_MEMBERS */
+PROC SQL; 
+
+SELECT *FROM MYLIB295.TESTING_DS_BI_FAMILY_MEMBERS;
+
+QUIT;
+
+/* Step 3: To find mod */
+PROC SQL; 
+
+SELECT to.MEMBERS_OF_FAMILY AS FAMILY_MEMBERS
+FROM MYLIB295.TESTING_DS_BI_FAMILY_MEMBERS to
+WHERE to.COUNTS EQ (SELECT MAX(ti.COUNTS) AS THE_HIGHEST_MOD
+					FROM MYLIB295.TESTING_DS_BI_FAMILY_MEMBERS ti);
+
+QUIT;
+
+/* Step 4: create after imputation table */
+PROC SQL;
+
+CREATE TABLE MYLIB295.TESTING_DS_FI_FM AS 
+SELECT *FROM MYLIB295.TESTING_DS_FI_G;
+
+QUIT;
+
+/*Step 5: Impute missing values*/
+PROC SQL; 
+
+UPDATE MYLIB295.TESTING_DS_FI_FM
+SET FAMILY_MEMBERS = (SELECT to.MEMBERS_OF_FAMILY AS FAMILY_MEMBERS
+			 FROM MYLIB295.TESTING_DS_BI_FAMILY_MEMBERS to 
+			 WHERE to.COUNTS EQ(SELECT MAX(ti.COUNTS) AS THE_HIGHEST_MOD
+			 					FROM MYLIB295.TESTING_DS_BI_FAMILY_MEMBERS ti))
+WHERE ((FAMILY_MEMBERS EQ "") OR 
+		(FAMILY_MEMBERS IS NULL));
+
+QUIT;
+
+/* After imputation */
+PROC FREQ DATA = MYLIB295.TESTING_DS_FI_FM; 
+
+TITLE "Fig 7.14.3 After Imputation Missing Values on Variable FAMILY_MEMBERS";
+TABLE FAMILY_MEMBERS; 
+
+RUN; 
+
+/* To Show How Many Missing Values */
+PROC SQL; 
+
+SELECT * FROM MYLIB295.TESTING_DS_FI_FM t
+WHERE ((t.FAMILY_MEMBERS EQ " ") OR 
+	  (t.FAMILY_MEMBERS IS NULL));
+
+QUIT;
+
+PROC SQL; 
+
+SELECT COUNT(*) LABEL = "NUMBER OF MISSING VALUES IN VARIABLE FAMILY_MEMBERS"
+FROM MYLIB295.TESTING_DS_FI_FM t
+WHERE ((t.FAMILY_MEMBERS EQ " ") OR 
+	  	(t.FAMILY_MEMBERS IS NULL));
+	  
+QUIT;
+
+/* to display imputted table for variable FAMILY_MEMBERS*/
+PROC SQL; 
+
+SELECT *FROM MYLIB295.TESTING_DS_FI_FM;
+
+QUIT;
+
+/***********************************************************************************
+7.14.1.4. Imputation of Missing Values Found on Categorical Variable (QUALIFICATION)
+************************************************************************************/
+/* Before Imputation on FAMILY_MEMBERS variable */
+PROC FREQ DATA = MYLIB295.TESTING_DS_FI_FM; 
+
+TITLE "Fig 7.14.1.4 Before Imputation Missing Values on Variable QUALIFICATION ";
+TABLE QUALIFICATION; 
+
+RUN;
+
+/* To Show How Many Missing Values */
+PROC SQL; 
+
+SELECT * FROM MYLIB295.TESTING_DS_FI_FM t
+WHERE ((t.QUALIFICATION EQ " ") OR 
+	  (t.QUALIFICATION IS NULL));
+
+QUIT;
+
+PROC SQL; 
+
+SELECT COUNT(*) LABEL = "NUMBER OF MISSING VALUES IN VARIABLE QUALIFICATION"
+FROM MYLIB295.TESTING_DS_FI_FM t
+WHERE ((t.QUALIFICATION EQ " ") OR 
+	  (t.QUALIFICATION IS NULL));
+	  
+QUIT;
+
+/***********************************************************************************
+7.14.5. Imputation of Missing Values Found on Categorical Variable (EMPLOYMENT)
+************************************************************************************/
+/* Before Imputation on EMPLOYMENT variable */
+PROC FREQ DATA = MYLIB295.TESTING_DS_FI_FM; 
+
+TITLE "Fig 7.14.5 Before Imputation Missing Values on Variable EMPLOYMENT ";
+TABLE EMPLOYMENT; 
+
+RUN;
+
+/* To Show How Many Missing Values */
+PROC SQL; 
+
+SELECT * FROM MYLIB295.TESTING_DS_FI_FM t
+WHERE ((t.EMPLOYMENT EQ " ") OR 
+	  (t.EMPLOYMENT IS NULL));
+
+QUIT;
+
+PROC SQL; 
+
+SELECT COUNT(*) LABEL = "NUMBER OF MISSING VALUES IN VARIABLE EMPLOYMENT"
+FROM MYLIB295.TESTING_DS_FI_FM t
+WHERE ((t.EMPLOYMENT EQ " ") OR 
+	  (t.EMPLOYMENT IS NULL));
+	  
+QUIT;
+
+/* Step 1a: to display each EMPLOYMENT */
+PROC SQL; 
+
+SELECT t.EMPLOYMENT AS EMPLOYMENT, COUNT(*) AS COUNTS 
+FROM MYLIB295.TESTING_DS_FI_FM t
+WHERE ((t.EMPLOYMENT NE " ") OR 
+	   (t.EMPLOYMENT IS NOT NULL))
+GROUP BY t.EMPLOYMENT; 
+
+QUIT; 
+
+/* Step 1b: to create EMPLOYMENT table */
+PROC SQL; 
+
+CREATE TABLE MYLIB295.TESTING_DS_BI_EMPLOYMENT AS 
+SELECT t.EMPLOYMENT AS EMPLOYMENT, COUNT(*) AS COUNTS 
+FROM MYLIB295.TESTING_DS_FI_FM t
+WHERE ((t.EMPLOYMENT NE " ") OR 
+	   (t.EMPLOYMENT IS NOT NULL))
+GROUP BY t.EMPLOYMENT; 
+
+QUIT;
+
+/* Step 2: To display newly created MYLIB295.TESTING_DS_BI_EMPLOYMENT */
+PROC SQL; 
+
+SELECT *FROM MYLIB295.TESTING_DS_BI_EMPLOYMENT;
+
+QUIT;
+
+/* Step 3: To find mod */
+PROC SQL; 
+
+SELECT to.EMPLOYMENT AS EMPLOYMENT
+FROM MYLIB295.TESTING_DS_BI_EMPLOYMENT to
+WHERE to.COUNTS EQ (SELECT MAX(ti.COUNTS) AS THE_HIGHEST_MOD
+					FROM MYLIB295.TESTING_DS_BI_EMPLOYMENT ti);
+
+QUIT;
+
+/* Step 4: create after imputation table */
+PROC SQL;
+
+CREATE TABLE MYLIB295.TESTING_DS_FI_E AS 
+SELECT *FROM MYLIB295.TESTING_DS_FI_FM;
+
+QUIT;
+
+/*Step 5: Impute missing values*/
+PROC SQL; 
+
+UPDATE MYLIB295.TESTING_DS_FI_E
+SET EMPLOYMENT = (SELECT to.EMPLOYMENT AS EMPLOYMENT
+			 FROM MYLIB295.TESTING_DS_BI_EMPLOYMENT to 
+			 WHERE to.COUNTS EQ(SELECT MAX(ti.COUNTS) AS THE_HIGHEST_MOD
+			 					FROM MYLIB295.TESTING_DS_BI_EMPLOYMENT ti))
+WHERE ((EMPLOYMENT EQ "") OR 
+		(EMPLOYMENT IS NULL));
+
+QUIT;
+
+/* After imputation */
+PROC FREQ DATA = MYLIB295.TESTING_DS_FI_E; 
+
+TITLE "Fig 7.14.5 After Imputation Missing Values on Variable EMPLOYMENT";
+TABLE EMPLOYMENT; 
+
+RUN; 
+
+/* To Show How Many Missing Values */
+PROC SQL; 
+
+SELECT * FROM MYLIB295.TESTING_DS_FI_E t
+WHERE ((t.EMPLOYMENT EQ " ") OR 
+	  (t.EMPLOYMENT IS NULL));
+
+QUIT;
+
+PROC SQL; 
+
+SELECT COUNT(*) LABEL = "NUMBER OF MISSING VALUES IN VARIABLE EMPLOYMENT"
+FROM MYLIB295.TESTING_DS_FI_E t
+WHERE ((t.EMPLOYMENT EQ " ") OR 
+	  	(t.EMPLOYMENT IS NULL));
+	  
+QUIT;
+
+/* to display imputted table for variable EMPLOYMENT*/
+PROC SQL; 
+
+SELECT *FROM MYLIB295.TESTING_DS_FI_E;
+
+QUIT;
+
+/***********************************************************************************
+7.14.6. Imputation of Missing Values Found on Categorical Variable (LOAN_LOCATION)
+************************************************************************************/
+/* Before Imputation on LOAN_LOCATION variable */
+PROC FREQ DATA = MYLIB295.TESTING_DS_FI_E; 
+
+TITLE "Fig 7.14.6 Before Imputation Missing Values on Variable LOAN_LOCATION ";
+TABLE LOAN_LOCATION; 
+
+RUN;
+
+/* To Show How Many Missing Values */
+PROC SQL; 
+
+SELECT * FROM MYLIB295.TESTING_DS_FI_E t
+WHERE ((t.LOAN_LOCATION EQ " ") OR 
+	  (t.LOAN_LOCATION IS NULL));
+
+QUIT;
+
+PROC SQL; 
+
+SELECT COUNT(*) LABEL = "NUMBER OF MISSING VALUES IN VARIABLE LOAN_LOCATION"
+FROM MYLIB295.TESTING_DS_FI_E t
+WHERE ((t.LOAN_LOCATION EQ " ") OR 
+	  (t.LOAN_LOCATION IS NULL));
+	  
+QUIT;
+
+
+/****************************************************************
+7.14.2. Imputation of Missing Values Found on Continuous Variable
+*******************************************************************/
+
+/**************************************************************
+7.14.7 Imputation of Missing Values Found in CANDIDATE_INCOME
+**************************************************************/
+/* To show missing values in CANDIDATE_INCOME */
+PROC SQL; 
+
+SELECT *
+FROM MYLIB295.TESTING_DS_FI_E
+WHERE (CANDIDATE_INCOME EQ . );
+
+QUIT;
+
+PROC SQL;
+
+SELECT COUNT(*) AS MISSING_OBSERVATIONS FROM MYLIB295.TESTING_DS_FI_E
+WHERE (CANDIDATE_INCOME EQ . );
+
+QUIT;
+
+/**************************************************************
+7.14.8 Imputation of Missing Values Found in GUARANTEE_INCOME
+**************************************************************/
+/* show missing values in GUARANTEE_INCOME */
+PROC SQL; 
+
+SELECT *
+FROM MYLIB295.TESTING_DS_FI_E
+WHERE (GUARANTEE_INCOME EQ . );
+
+QUIT;
+
+PROC SQL;
+
+SELECT COUNT(*) AS MISSING_OBSERVATIONS FROM MYLIB295.TESTING_DS_FI_E
+WHERE (GUARANTEE_INCOME EQ . );
+
+QUIT;
+
+/**************************************************************
+7.14.9 Imputation of Missing Values Found in LOAN_AMOUNT
+**************************************************************/
+/* To show missing values in LOAN_AMOUNT */
+PROC SQL; 
+
+SELECT *
+FROM MYLIB295.TESTING_DS_FI_E
+WHERE (LOAN_AMOUNT EQ . );
+
+QUIT;
+
+PROC SQL;
+
+SELECT COUNT(*) AS MISSING_OBSERVATIONS FROM MYLIB295.TESTING_DS_FI_E
+WHERE (LOAN_AMOUNT EQ . );
+
+QUIT;
+
+/* impute with mean */
+PROC STDIZE DATA = MYLIB295.TESTING_DS_FI_E REPONLY
+METHOD = MEAN OUT = MYLIB295.TESTING_DS_FI_LA; 
+VAR LOAN_AMOUNT; 
+
+QUIT;  
+
+/* count missing observations in LOAN_AMOUNT */
+PROC SQL;
+
+SELECT COUNT(*) AS MISSING_OBSERVATIONS FROM MYLIB295.TESTING_DS_FI_LA
+WHERE (LOAN_AMOUNT EQ . );
+
+QUIT;
+
+/**************************************************************
+7.14.10 Imputation of Missing Values Found in LOAN_DURATION
+**************************************************************/
+/* show missing values in LOAN_DURATION */
+PROC SQL; 
+
+SELECT *
+FROM MYLIB295.TESTING_DS_FI_LA
+WHERE (LOAN_DURATION EQ . );
+
+QUIT;
+
+PROC SQL;
+
+SELECT COUNT(*) AS MISSING_OBSERVATIONS FROM MYLIB295.TESTING_DS_FI_LA
+WHERE (LOAN_DURATION EQ . );
+
+QUIT;
+
+/* impute with mean */
+PROC STDIZE DATA = MYLIB295.TESTING_DS_FI_LA REPONLY
+METHOD = MEAN OUT = MYLIB295.TESTING_DS_FI_LD; 
+VAR LOAN_DURATION; 
+
+QUIT;  
+
+/* count missing observations in LOAN_DURATION */
+PROC SQL;
+
+SELECT COUNT(*) AS MISSING_OBSERVATIONS FROM MYLIB295.TESTING_DS_FI_LD
+WHERE (LOAN_DURATION EQ . );
+
+QUIT;
+
+/**************************************************************
+7.13.2.5 Imputation of Missing Values Found in LOAN_HISTORY
+**************************************************************/
+/* show missing values in LOAN_HISTORY */
+PROC SQL; 
+
+SELECT *
+FROM MYLIB295.TESTING_DS_FI_LD
+WHERE (LOAN_HISTORY EQ . );
+
+QUIT;
+
+PROC SQL;
+
+SELECT COUNT(*) AS MISSING_OBSERVATIONS FROM MYLIB295.TESTING_DS_FI_LD
+WHERE (LOAN_HISTORY EQ . );
+
+QUIT;
+
+/* impute with mean */
+PROC STDIZE DATA = MYLIB295.TESTING_DS_FI_LD REPONLY
+METHOD = MEAN OUT = MYLIB295.TESTING_DS_FI_LH; 
+VAR LOAN_HISTORY; 
+
+QUIT;  
+
+/* count missing observations in LOAN_HISTORY */
+PROC SQL;
+
+SELECT COUNT(*) AS MISSING_OBSERVATIONS FROM MYLIB295.TESTING_DS_FI_LH
+WHERE (LOAN_HISTORY EQ . );
+
+QUIT;
+
+/* TESTING DATA FOR CATEGORICAL AND CONTINUOUS VARIABLES ARE CLEANED */
+/* LIBRARY USED IS MYLIB295.TESTING_DS_FI_LH */
+
+
+/*******************************************
+7.15. Building Logistic Regression model
+********************************************/
+/*Step 1: Make a copy of training dataset*/
+PROC SQL;
+
+CREATE TABLE MYLIB295.TRAINING_DS_CLEANED AS
+SELECT *FROM MYLIB295.TRAINING_DS_FI_LH; 
+
+QUIT;  
+
+/* STEP 2: CHECK IF THERE ARE MISSING VALUES */
+PROC FREQ DATA = MYLIB295.TRAINING_DS_CLEANED;
+
+TABLE 
+LOAN_AMOUNT 
+LOAN_DURATION 
+MARITAL_STATUS 
+QUALIFICATION 
+GENDER 
+FAMILY_MEMBERS
+EMPLOYMENT
+SME_LOAN_ID_NO
+CANDIDATE_INCOME
+GUARANTEE_INCOME
+LOAN_APPROVAL_STATUS
+LOAN_HISTORY 
+LOAN_LOCATION; 
+
+RUN; 
+
+/*********************************************************************************************
+STEP 3: Building Logistic Regression model for on the training dataset  
+**********************************************************************************************/
+PROC LOGISTIC DATA = MYLIB295.TRAINING_DS_CLEANED OUTMODEL = MYLIB295.TRAINING_DS_CLEANED_MODEL; 
+
+CLASS 
+MARITAL_STATUS 
+QUALIFICATION 
+GENDER 
+FAMILY_MEMBERS
+EMPLOYMENT
+LOAN_LOCATION
+SME_LOAN_ID_NO;
+
+/* LISTED ABOVE ARE ALL CATEGORICAL VARIABLES*/
+MODEL LOAN_APPROVAL_STATUS = /* DEPENDENT VARIABLE */
+
+LOAN_AMOUNT 
+LOAN_DURATION  
+CANDIDATE_INCOME
+GUARANTEE_INCOME
+LOAN_HISTORY
+MARITAL_STATUS 
+QUALIFICATION 
+GENDER 
+FAMILY_MEMBERS
+EMPLOYMENT
+LOAN_LOCATION; 
+
+/* result */
+OUTPUT OUT = MYLIB295.TRAINING_DS_CLEANED_OUT P = PREDICT_PROB;
+/* P will be holding predicted probability */
+/* IF AIC (Akaike Information Criterion) less than SC (Scwarz Criterion) the predict model is good (best fit)*/
+/* if Pr < ChiSq variables has the best contribution in prediction */
+RUN; 
+
+/* to display estimated probability result data */
+PROC SQL; 
+
+SELECT *
+FROM MYLIB295.TRAINING_DS_CLEANED_OUT;
+
+QUIT;
+
+/* check the imputted testing dataset */
+PROC SQL; 
+
+SELECT *FROM MYLIB295.TESTING_DS_FI_LH;
+
+QUIT; 
+
+/*Step 1: Make a copy of testing dataset*/
+PROC SQL;
+
+CREATE TABLE MYLIB295.TESTING_DS_CLEANED AS
+SELECT *FROM MYLIB295.TESTING_DS_FI_LH; 
+
+QUIT;  
+
+/*FOR PREDICTION */
+PROC LOGISTIC INMODEL = MYLIB295.TRAINING_DS_CLEANED_MODEL; /* create model */
+
+SCORE DATA = MYLIB295.TESTING_DS_CLEANED /* testing dataset */
+OUT = MYLIB295.TESTING_DS_PRED_OUT; /* stored */
+
+RUN; 
+
+/* Display Output */
+/* pred prob = N (entry) & pred prob = Y (exit) */
+PROC SQL; 
+
+SELECT *FROM MYLIB295.TESTING_DS_PRED_OUT;
+
+QUIT; 
+
+/**********************************
+Using Output Delivery System - ODS (to transfer outcome of program)
+***********************************/
+/* Method 1 */
+ODS HTML CLOSE;
+ODS PDF CLOSE;
+
+/* Determine physical location in pdf file */
+ODS PDF FILE = "//home/u49263746/MY_DAP_ASSIGNMENT_TP059295/TESTLOAN_DS_PREDICT_OUT";
+OPTION NOBYLINE NODATE;
+TITLE "LOAN APPROVAL STATUS PREDICTION";
+
+PROC REPORT DATA = MYLIB295.TESTLOAN_DS_PREDICT_OUT;
+
+BY SME_LOAN_ID_NO; /* group by SME */
+DEFINE SME_LOAN_ID_NP / GROUP 'ID OF LOAN';
+DEFINE I_LOAN_APPROVAL_STATUS /GROUP 'APPROVAL STATUS';
+
+RUN;
+OPTION BYLINE;
+
+/* to inspect where data and library is stored */
+PROC DATASETS library = MYLIB295 memtype = file; 
+RUN;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
